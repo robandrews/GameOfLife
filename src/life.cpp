@@ -38,8 +38,7 @@ void printGrid(Grid<char> &grid){
     }
 }
 
-char life(int xCoord, int yCoord, Grid<char> &grid){
-//    Build offset array
+Grid<int> buildOffsetArray(){
     Grid<int> offsets(8,2);
     int counter = 0;
     for(int i=-1; i < 2; i++){
@@ -52,6 +51,14 @@ char life(int xCoord, int yCoord, Grid<char> &grid){
         }
     }
 
+    return offsets;
+}
+
+char life(int xCoord, int yCoord, Grid<char> &grid){
+//    Build offset array
+
+    Grid<int> offsets = buildOffsetArray();
+
     int neighbors = 0;
     for(int i=0; i < offsets.numRows(); i++){
         int x = xCoord + offsets[i][0];
@@ -60,19 +67,24 @@ char life(int xCoord, int yCoord, Grid<char> &grid){
             neighbors++;
         }
     }
+//    cout << "Position: " << xCoord << "," << yCoord << " Neighbors: " << neighbors << endl;
 
-    if(neighbors < 1){return '-';}
+    if(neighbors <= 1){return '-';}
+    else if(neighbors == 2){return grid[xCoord][yCoord];}
     else if(neighbors == 3){return 'X';}
-    else if(neighbors == 2 && grid[xCoord][yCoord] == 'X'){return 'X';}
     else{return '-';};
 }
 
 void stepGrid(Grid<char> &grid){
+    Grid<char> nextGrid(grid.numRows(), grid.numCols());
+
     for(int i = 0; i< grid.numRows(); i++){
         for(int j = 0; j < grid.numCols(); j++){
-            grid.set(i, j, life(i, j, grid));
+            nextGrid.set(i, j, life(i, j, grid));
         }
     }
+
+    grid = nextGrid;
 }
 
 int main() {
@@ -100,7 +112,7 @@ int main() {
 
     printGrid(lifeGrid);
 
-    for(int i = 0; i<500; i++){
+    for(int i = 0; i<250; i++){
         clearConsole();
         printGrid(lifeGrid);
         stepGrid(lifeGrid);
