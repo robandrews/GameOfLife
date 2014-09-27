@@ -28,10 +28,6 @@ string collectFile(){
     return fileName;
 }
 
-void buildGrid(Grid<char> &grid){
-
-}
-
 void printGrid(Grid<char> &grid){
     clearConsole();
     for(int i = 0; i< grid.numRows(); i++){
@@ -42,16 +38,39 @@ void printGrid(Grid<char> &grid){
     }
 }
 
-bool stayAlive(int xCoord, int yCoord, Grid<char> &grid){
+char life(int xCoord, int yCoord, Grid<char> &grid){
+//    Build offset array
+    Grid<int> offsets(8,2);
+    int counter = 0;
+    for(int i=-1; i < 2; i++){
+        for(int j=-1; j < 2; j++){
+            if(!(i==0 && j==0)){
+                offsets.set(counter, 0, i);
+                offsets.set(counter, 1, j);
+                counter++;
+            }
+        }
+    }
 
+    int neighbors = 0;
+    for(int i=0; i < offsets.numRows(); i++){
+        int x = xCoord + offsets[i][0];
+        int y = yCoord + offsets[i][1];
+        if(grid.inBounds(x, y) && grid[x][y] == 'X'){
+            neighbors++;
+        }
+    }
+
+    if(neighbors < 1){return '-';}
+    else if(neighbors == 3){return 'X';}
+    else if(neighbors == 2 && grid[xCoord][yCoord] == 'X'){return 'X';}
+    else{return '-';};
 }
 
 void stepGrid(Grid<char> &grid){
     for(int i = 0; i< grid.numRows(); i++){
         for(int j = 0; j < grid.numCols(); j++){
-            if(stayAlive(i, j, grid)){
-                grid.set(i, j, '0');
-            }
+            grid.set(i, j, life(i, j, grid));
         }
     }
 }
@@ -69,7 +88,7 @@ int main() {
     getline(inputFile, tempLine);
     numCols = stringToInteger(tempLine);
 
-//    Build game
+//    Build grid
     Grid<char> lifeGrid;
     lifeGrid.resize(numRows, numCols);
     for(int i=0; i < numRows; i++){
@@ -80,9 +99,13 @@ int main() {
     }
 
     printGrid(lifeGrid);
-    stepGrid(lifeGrid);
-    pause(500);
-    printGrid(lifeGrid);
+
+    for(int i = 0; i<500; i++){
+        clearConsole();
+        printGrid(lifeGrid);
+        stepGrid(lifeGrid);
+        pause(50);
+    }
 
     return 0;
 }
