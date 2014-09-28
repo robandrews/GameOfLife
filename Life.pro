@@ -1,4 +1,4 @@
-TEMPLATE = app
+tTEMPLATE = app
 
 # Make sure we do not accidentally #include files placed in 'resources'
 CONFIG += no_include_pwd

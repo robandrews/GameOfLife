@@ -55,7 +55,7 @@ Grid<int> buildOffsetArray(){
 }
 
 char life(int xCoord, int yCoord, Grid<char> &grid){
-//    Build offset array
+    //    Build offset array
 
     Grid<int> offsets = buildOffsetArray();
 
@@ -67,7 +67,7 @@ char life(int xCoord, int yCoord, Grid<char> &grid){
             neighbors++;
         }
     }
-//    cout << "Position: " << xCoord << "," << yCoord << " Neighbors: " << neighbors << endl;
+    //    cout << "Position: " << xCoord << "," << yCoord << " Neighbors: " << neighbors << endl;
 
     if(neighbors <= 1){return '-';}
     else if(neighbors == 2){return grid[xCoord][yCoord];}
@@ -87,20 +87,10 @@ void stepGrid(Grid<char> &grid){
     grid = nextGrid;
 }
 
-int main() {
+Grid<char> buildGrid(int numRows, int numCols, ifstream &inputFile){
 
-    int numRows, numCols;
     string tempLine;
-    ifstream inputFile;
-
-//    Get board size
-    openFile(inputFile, collectFile());
-    getline(inputFile, tempLine);
-    numRows = stringToInteger(tempLine);
-    getline(inputFile, tempLine);
-    numCols = stringToInteger(tempLine);
-
-//    Build grid
+    //    Build grid
     Grid<char> lifeGrid;
     lifeGrid.resize(numRows, numCols);
     for(int i=0; i < numRows; i++){
@@ -110,14 +100,52 @@ int main() {
         }
     }
 
-    printGrid(lifeGrid);
+    return lifeGrid;
+}
 
-    for(int i = 0; i<250; i++){
+void promptUser(int &cycles, bool &reprompt){
+    cout << "a)nimate, t)ick, q)uit? ";
+    string response;
+    cin >> response;
+    if(response ==  "a"){
+        cycles = 250;
+    }else if(response == "t"){
+        cycles++;
+        reprompt = true;
+    };
+}
+
+int main() {
+    int numRows, numCols;
+    string tempLine;
+    ifstream inputFile;
+
+    //    Get board size
+    openFile(inputFile, collectFile());
+    getline(inputFile, tempLine);
+    numRows = stringToInteger(tempLine);
+    getline(inputFile, tempLine);
+    numCols = stringToInteger(tempLine);
+
+
+    Grid<char> lifeGrid = buildGrid(numRows, numCols, inputFile);
+
+    int cycles = 0;
+    bool reprompt = false;
+    printGrid(lifeGrid);
+    promptUser(cycles, reprompt);
+
+    for(int i = 0; i<cycles; i++){
         clearConsole();
-        printGrid(lifeGrid);
         stepGrid(lifeGrid);
-        pause(50);
+        printGrid(lifeGrid);
+        pause(20);
+        if(reprompt){
+            promptUser(cycles, reprompt);
+        }
     }
 
+    clearConsole();
+    cout << "Thanks for playing the game of life.";
     return 0;
 }
